@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+Server/.env
+
+# OS files
+.DS_Store
+
+# Temporary files
+temp/
+*.tmp
+Server/rzp.numbers

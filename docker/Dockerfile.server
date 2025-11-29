@@ -1,0 +1,29 @@
+# Use a Node.js base image
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Copy package.json and package-lock.json from the local 'server' directory
+COPY Server/package*.json ./
+
+# Clear npm cache and install production dependencies
+
+# Clear npm cache and install production dependencies
+# Clear npm cache and install dependencies
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps --no-audit --no-fund
+
+# Install TypeScript globally to ensure tsc is available
+RUN npm install -g typescript
+
+# Copy only the server source into the image
+COPY Server ./
+
+# Expose the application port
+EXPOSE 8000
+
+# RUN npx prisma generate
+RUN npm run build
+
+# Set the default command to run the application
+CMD ["node", "dist/index.js"]
