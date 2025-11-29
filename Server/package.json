@@ -4,9 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsc -b && nodemon ./dist/index.js",
-    "build": "npx prisma generate tsc -b",
-    "start": "node ./dist/index.js",
+    "dev": "ts-node-dev src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
     "build:prod": "npm run prisma:generate && tsc -b",
