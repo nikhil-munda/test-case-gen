@@ -25,16 +25,17 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package.json only (not package-lock.json to avoid conflicts)
+COPY package.json ./
 
-# Install only production dependencies
-RUN npm install --legacy-peer-deps --omit=dev
+# Install production dependencies
+RUN npm cache clean --force && \
+    npm install --legacy-peer-deps --omit=dev
 
-# Copy built files from base stage
-COPY --from=base /app/dist ./dist
-COPY --from=base /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=base /app/prisma ./prisma
+# Copy built files from build stage
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 
 # Expose port (Render will override this with its own PORT)
 EXPOSE 10000
