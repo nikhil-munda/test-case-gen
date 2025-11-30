@@ -1,21 +1,43 @@
-# Use a Node.js base image
+# Use Node.js 20 Alpine as base image
 FROM node:20-alpine AS base
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Clear npm cache and install dependencies
+# Install dependencies
 RUN npm cache clean --force && \
-    npm install --legacy-peer-deps --omit=dev --no-audit --no-fund
+    npm install --legacy-peer-deps
 
-# Copy the application source code
+# Copy application source code
 COPY . .
 
-# Expose the application port
-EXPOSE 3000
+# Generate Prisma client
+RUN npx prisma generate
 
-# Set the default command to run the application
-CMD ["node", "src/index.js"]
+# Build TypeScript to JavaScript
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine AS production
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm install --legacy-peer-deps --omit=dev
+
+# Copy built files from base stage
+COPY --from=base /app/dist ./dist
+COPY --from=base /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=base /app/prisma ./prisma
+
+# Expose port (Render will override this with its own PORT)
+EXPOSE 10000
+
+# Run migrations and start server
+CMD npx prisma migrate deploy && node dist/index.js
