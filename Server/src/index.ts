@@ -15,9 +15,27 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    process.env.CLIENT_URL
+].filter(Boolean);
 
 app.use(
-    cors({ credentials: true, origin: "http://localhost:3000", exposedHeaders: ["Set-Cookie"] })
+    cors({ 
+        credentials: true, 
+        origin: (origin, callback) => {
+            // Allow requests with no origin (mobile apps, Postman, curl)
+            if (!origin) return callback(null, true);
+            
+            if (allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        }, 
+        exposedHeaders: ["Set-Cookie"] 
+    })
 );
 // Cookie parser MUST be before routes that use cookies
 app.use(cookieParser());

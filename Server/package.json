@@ -4,12 +4,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "tsx watch src/index.ts",
     "build": "tsc",
+    "build:prod": "npm run prisma:generate && tsc",
     "start": "node dist/index.js",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate deploy",
-    "build:prod": "npm run prisma:generate && tsc -b",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -48,6 +48,10 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/nodemailer": "^7.0.2"
+    "@types/node": "^24.10.1",
+    "@types/nodemailer": "^7.0.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3"
   }
 }
