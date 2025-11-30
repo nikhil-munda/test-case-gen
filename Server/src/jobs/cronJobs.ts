@@ -1,7 +1,7 @@
-import { CronJob } from "cron";
+import  cron  from 'cron';
 import { prisma } from "../utilities/prisma.js";
 
-const job = new CronJob(
+const job = new cron.CronJob(
   "0 0 * * *", 
   async function () {
    try {

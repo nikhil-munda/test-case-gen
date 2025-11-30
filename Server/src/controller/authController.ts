@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
+
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
