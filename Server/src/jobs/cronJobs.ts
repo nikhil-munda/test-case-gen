@@ -1,9 +1,10 @@
 import cron from "node-cron";
 import { prisma } from "../utilities/prisma.js";
 
-const job = new cron.CronJob(
+// Schedule job to run daily at midnight
+const job = cron.schedule(
   "0 0 * * *",
-  async function () {
+  async () => {
     try {
       const fiveMinutesAgo = new Date();
       fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
@@ -16,13 +17,16 @@ const job = new cron.CronJob(
           },
         },
       });
+
+      console.log(`Deleted ${deletedOTPs.count} expired OTPs`);
     } catch (error) {
-      console.log("error in the cronejob ", error);
+      console.log("Error in cron job:", error);
     }
-  }, // onTick
-  null, // onComplete
-  true, // start
-  "Asia/Kolkata"
+  },
+  {
+    scheduled: true,
+    timezone: "Asia/Kolkata",
+  }
 );
 
 export { job };
