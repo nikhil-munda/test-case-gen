@@ -7,17 +7,19 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install all dependencies (including dev for building)
 RUN npm cache clean --force && \
     npm install --legacy-peer-deps
 
-# Copy application source code
-COPY . .
+# Copy source code
+COPY tsconfig.json ./
+COPY prisma ./prisma
+COPY src ./src
 
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build TypeScript to JavaScript
+# Build TypeScript
 RUN npm run build
 
 # Production stage
@@ -25,19 +27,19 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Copy package.json only (not package-lock.json to avoid conflicts)
-COPY package.json ./
+# Copy package files
+COPY package*.json ./
 
-# Install production dependencies
+# Install only production dependencies
 RUN npm cache clean --force && \
     npm install --legacy-peer-deps --omit=dev
 
-# Copy built files from build stage
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+# Copy built artifacts from base stage (not "build")
+COPY --from=base /app/dist ./dist
+COPY --from=base /app/prisma ./prisma
+COPY --from=base /app/node_modules/.prisma ./node_modules/.prisma
 
-# Expose port (Render will override this with its own PORT)
+# Expose port
 EXPOSE 10000
 
 # Run migrations and start server
